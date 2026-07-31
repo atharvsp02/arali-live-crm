@@ -1,0 +1,97 @@
+services:
+  - type: web
+    name: arali-live-crm
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    preDeployCommand: ./node_modules/.bin/prisma migrate deploy && ./node_modules/.bin/tsx prisma/seed.ts
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_URL
+        fromService:
+          type: web
+          name: arali-live-crm
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: CLIENT_URL
+        fromService:
+          type: web
+          name: arali-live-crm
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: DATABASE_URL
+        fromDatabase:
+          name: arali-live-crm-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: arali-live-crm-redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FOLLOW_UP_DELAY_MS
+        value: "30000"
+      - key: LOG_LEVEL
+        value: info
+
+  - type: worker
+    name: arali-live-crm-worker
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: node dist/worker.js
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_URL
+        fromService:
+          type: web
+          name: arali-live-crm
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: CLIENT_URL
+        fromService:
+          type: web
+          name: arali-live-crm
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: DATABASE_URL
+        fromDatabase:
+          name: arali-live-crm-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: arali-live-crm-redis
+          property: connectionString
+      - key: JWT_SECRET
+        fromService:
+          type: web
+          name: arali-live-crm
+          envVarKey: JWT_SECRET
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FOLLOW_UP_DELAY_MS
+        value: "30000"
+      - key: LOG_LEVEL
+        value: info
+
+  - type: keyvalue
+    name: arali-live-crm-redis
+    plan: starter
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+    persistenceMode: journal-snapshot
+
+databases:
+  - name: arali-live-crm-db
+    plan: basic-256mb
+    databaseName: live_crm
+    user: live_crm
+    postgresMajorVersion: "17"
+    ipAllowList: []

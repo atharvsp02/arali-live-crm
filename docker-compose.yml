@@ -1,0 +1,97 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: live_crm
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d live_crm"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:8-alpine
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+
+  migrate:
+    build:
+      context: .
+    command: ./node_modules/.bin/prisma migrate deploy
+    environment: &app-environment
+      NODE_ENV: production
+      PORT: 4000
+      APP_URL: http://localhost:${APP_PORT:-4000}
+      CLIENT_URL: http://localhost:${APP_PORT:-4000}
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/live_crm
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-local-docker-secret-with-at-least-32-characters}
+      JWT_EXPIRES_IN: 1d
+      FOLLOW_UP_DELAY_MS: ${FOLLOW_UP_DELAY_MS:-30000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  seed:
+    build:
+      context: .
+    command: ./node_modules/.bin/tsx prisma/seed.ts
+    environment: *app-environment
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  api:
+    build:
+      context: .
+    environment: *app-environment
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:4000/api/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "${APP_PORT:-4000}:4000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+
+  worker:
+    build:
+      context: .
+    command: node dist/worker.js
+    environment: *app-environment
+    depends_on:
+      redis:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+
+volumes:
+  postgres_data:
+  redis_data:
