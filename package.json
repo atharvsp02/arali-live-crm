@@ -1,0 +1,29 @@
+{
+  "name": "live-crm",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.18.0",
+  "scripts": {
+    "build": "pnpm --filter @live-crm/shared build && pnpm --filter @live-crm/server build && pnpm --filter @live-crm/web build",
+    "db:migrate": "pnpm --filter @live-crm/server db:migrate",
+    "db:migrate:deploy": "pnpm --filter @live-crm/server db:migrate:deploy",
+    "db:seed": "pnpm --filter @live-crm/server db:seed",
+    "dev": "concurrently -n api,worker,web -c blue,magenta,green \"pnpm --filter @live-crm/server dev:api\" \"pnpm --filter @live-crm/server dev:worker\" \"pnpm --filter @live-crm/web dev\"",
+    "format:check": "prettier --check .",
+    "lint": "eslint apps packages",
+    "test": "sh scripts/test.sh",
+    "test:coverage": "sh scripts/test.sh --coverage",
+    "test:e2e": "playwright test",
+    "typecheck": "pnpm --filter @live-crm/shared typecheck && pnpm --filter @live-crm/server typecheck && pnpm --filter @live-crm/web typecheck"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.2",
+    "@playwright/test": "1.62.0",
+    "concurrently": "10.0.4",
+    "eslint": "9.39.2",
+    "globals": "16.4.0",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.65.0"
+  }
+}

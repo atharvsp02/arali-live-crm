@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SystemRole {
+  ADMIN
+  USER
+}
+
+enum AssignmentRole {
+  ACCOUNT_OWNER
+  SALES_REPRESENTATIVE
+  RELATIONSHIP_MANAGER
+  CONTACT_OWNER
+}
+
+enum NotificationType {
+  COMPANY_ASSIGNED
+  CONTACT_ASSIGNED
+  FOLLOW_UP_REMINDER
+}
+
+model User {
+  id                         String              @id @default(uuid()) @db.Uuid
+  name                       String
+  email                      String              @unique
+  passwordHash               String
+  systemRole                 SystemRole
+  createdAt                  DateTime            @default(now())
+  updatedAt                  DateTime            @updatedAt
+  companiesCreated           Company[]
+  contactsCreated            Contact[]
+  companyAssignmentsReceived CompanyAssignment[] @relation("CompanyAssignmentRecipient")
+  companyAssignmentsCreated  CompanyAssignment[] @relation("CompanyAssignmentCreator")
+  contactAssignmentsReceived ContactAssignment[] @relation("ContactAssignmentRecipient")
+  contactAssignmentsCreated  ContactAssignment[] @relation("ContactAssignmentCreator")
+  notifications              Notification[]
+}
+
+model Company {
+  id          String              @id @default(uuid()) @db.Uuid
+  name        String
+  website     String?
+  industry    String?
+  description String?
+  createdById String              @db.Uuid
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  createdBy   User                @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  contacts    Contact[]
+  assignments CompanyAssignment[]
+
+  @@index([createdById])
+  @@index([name])
+}
+
+model Contact {
+  id          String              @id @default(uuid()) @db.Uuid
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  jobTitle    String?
+  companyId   String?             @db.Uuid
+  createdById String              @db.Uuid
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  company     Company?            @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  createdBy   User                @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  assignments ContactAssignment[]
+
+  @@index([companyId])
+  @@index([createdById])
+  @@index([firstName, lastName])
+}
+
+model CompanyAssignment {
+  id           String         @id @default(uuid()) @db.Uuid
+  companyId    String         @db.Uuid
+  userId       String         @db.Uuid
+  assignedById String         @db.Uuid
+  role         AssignmentRole
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  company      Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user         User           @relation("CompanyAssignmentRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  assignedBy   User           @relation("CompanyAssignmentCreator", fields: [assignedById], references: [id], onDelete: Restrict)
+
+  @@unique([companyId, userId])
+  @@index([userId])
+  @@index([assignedById])
+}
+
+model ContactAssignment {
+  id           String         @id @default(uuid()) @db.Uuid
+  contactId    String         @db.Uuid
+  userId       String         @db.Uuid
+  assignedById String         @db.Uuid
+  role         AssignmentRole
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  contact      Contact        @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  user         User           @relation("ContactAssignmentRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  assignedBy   User           @relation("ContactAssignmentCreator", fields: [assignedById], references: [id], onDelete: Restrict)
+
+  @@unique([contactId, userId])
+  @@index([userId])
+  @@index([assignedById])
+}
+
+model Notification {
+  id                 String           @id @default(uuid()) @db.Uuid
+  userId             String           @db.Uuid
+  type               NotificationType
+  title              String
+  message            String
+  metadata           Json
+  deduplicationKey   String?          @unique
+  readAt             DateTime?
+  createdAt          DateTime         @default(now())
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, readAt])
+}
