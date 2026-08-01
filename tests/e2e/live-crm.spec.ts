@@ -50,6 +50,20 @@ test("presents the public CRM landing page and demo entry point", async ({
     )
     .toBeGreaterThan(0);
 
+  const productPreview = page.locator(".landing-product-frame");
+  await expect(
+    productPreview.getByText("Welcome back, Atharv.", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    productPreview.getByText("My companies", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    productPreview.getByText("My contacts", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    productPreview.getByText("New assignment", { exact: true }),
+  ).toBeVisible();
+
   await page
     .locator(".landing-hero-actions")
     .getByRole("link", { name: "Open application" })

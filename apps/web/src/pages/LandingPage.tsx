@@ -9,14 +9,14 @@ import {
 import {
   ArrowRight,
   Bell,
-  BriefcaseBusiness,
   Building2,
-  Clock3,
-  ContactRound,
+  CalendarClock,
+  CheckCircle2,
+  ChevronDown,
+  LayoutDashboard,
   Menu,
-  RadioTower,
   Search,
-  UserRoundCheck,
+  UsersRound,
   X,
 } from "lucide-react";
 import { AraliLogo } from "../components/AraliLogo";
@@ -187,20 +187,16 @@ export function LandingPage() {
                   </div>
                   <div className="landing-preview-label">Workspace</div>
                   <div className="landing-preview-link active">
-                    <BriefcaseBusiness size={14} />
+                    <LayoutDashboard size={14} />
                     Overview
                   </div>
                   <div className="landing-preview-link">
                     <Building2 size={14} />
-                    Companies
+                    My companies
                   </div>
                   <div className="landing-preview-link">
-                    <ContactRound size={14} />
-                    Contacts
-                  </div>
-                  <div className="landing-preview-link">
-                    <UserRoundCheck size={14} />
-                    Assignments
+                    <UsersRound size={14} />
+                    My contacts
                   </div>
                 </aside>
 
@@ -208,78 +204,82 @@ export function LandingPage() {
                   <div className="landing-preview-header">
                     <div>
                       <Search size={14} />
-                      Search customers
+                      Search your assignments...
                     </div>
                     <span className="landing-preview-bell">
                       <Bell size={15} />
                       <small>2</small>
                     </span>
-                    <span className="landing-preview-avatar">A</span>
+                    <span className="landing-preview-profile">
+                      <span className="landing-preview-avatar">A</span>
+                      <strong>Atharv</strong>
+                      <ChevronDown size={12} />
+                    </span>
                   </div>
                   <div className="landing-preview-content">
-                    <span className="eyebrow">Admin workspace</span>
-                    <h2>Customer ownership overview</h2>
-                    <p>Manage customer records and current assignments.</p>
+                    <span className="eyebrow">Your workspace</span>
+                    <h2>Welcome back, Atharv.</h2>
+                    <p>
+                      Stay on top of customer ownership and act on your latest
+                      assignments.
+                    </p>
                     <div className="landing-preview-stats">
                       <div>
-                        <span>Companies</span>
-                        <strong>03</strong>
+                        <span className="landing-preview-stat-icon">
+                          <Building2 size={16} />
+                        </span>
+                        <span>
+                          <strong>02</strong>
+                          <small>Assigned companies</small>
+                        </span>
                       </div>
                       <div>
-                        <span>Contacts</span>
-                        <strong>03</strong>
+                        <span className="landing-preview-stat-icon">
+                          <UsersRound size={16} />
+                        </span>
+                        <span>
+                          <strong>01</strong>
+                          <small>Assigned contacts</small>
+                        </span>
                       </div>
                       <div>
-                        <span>Team members</span>
-                        <strong>02</strong>
+                        <span className="landing-preview-stat-icon">
+                          <CalendarClock size={16} />
+                        </span>
+                        <span>
+                          <strong>02</strong>
+                          <small>Unread notifications</small>
+                        </span>
                       </div>
                     </div>
-                    <div className="landing-preview-grid">
-                      <div className="landing-preview-card">
-                        <div className="landing-preview-card-head">
-                          <span>Recent assignments</span>
-                          <small>View all</small>
-                        </div>
-                        <div className="landing-preview-row">
-                          <span className="landing-company-icon">
-                            <Building2 size={15} />
-                          </span>
-                          <span>
-                            <strong>Company account</strong>
-                            <small>Assigned to account owner</small>
-                          </span>
-                          <small className="landing-row-role">Owner</small>
-                        </div>
-                        <div className="landing-preview-row">
-                          <span className="landing-company-icon warm">
-                            <ContactRound size={15} />
-                          </span>
-                          <span>
-                            <strong>Customer contact</strong>
-                            <small>Assigned to contact owner</small>
-                          </span>
-                          <small className="landing-row-role">Primary</small>
-                        </div>
+                    <div className="landing-preview-section">
+                      <div className="landing-preview-section-heading">
+                        <span className="eyebrow">Accounts</span>
+                        <strong>Your companies</strong>
+                        <small>
+                          Organizations where you currently own a role.
+                        </small>
                       </div>
-                      <div className="landing-preview-card landing-activity-card">
-                        <span>Live activity</span>
-                        <div className="landing-activity-item">
-                          <span className="landing-activity-icon">
-                            <RadioTower size={15} />
-                          </span>
-                          <p>
-                            <strong>Assignment delivered</strong>
-                            <small>Sent privately to the account owner</small>
-                          </p>
+                      <div className="landing-preview-grid">
+                        <div className="landing-preview-assignment-card">
+                          <div>
+                            <span className="landing-company-icon">
+                              <Building2 size={15} />
+                            </span>
+                            <small>Account owner</small>
+                          </div>
+                          <strong>Northstar Labs</strong>
+                          <span>Software · 3 contacts</span>
                         </div>
-                        <div className="landing-activity-item">
-                          <span className="landing-activity-icon muted">
-                            <Clock3 size={15} />
-                          </span>
-                          <p>
-                            <strong>Follow-up queued</strong>
-                            <small>Reminder scheduled automatically</small>
-                          </p>
+                        <div className="landing-preview-assignment-card">
+                          <div>
+                            <span className="landing-company-icon">
+                              <Building2 size={15} />
+                            </span>
+                            <small>Relationship manager</small>
+                          </div>
+                          <strong>Acme Corp</strong>
+                          <span>Technology · 2 contacts</span>
                         </div>
                       </div>
                     </div>
@@ -287,13 +287,12 @@ export function LandingPage() {
                 </div>
 
                 <div className="landing-notification-card">
-                  <span className="landing-notification-index">01</span>
+                  <CheckCircle2 size={16} />
                   <div>
-                    <strong>New company assignment</strong>
-                    <span>Company account · Account owner</span>
-                    <small>Delivered to assigned user</small>
+                    <strong>New assignment</strong>
+                    <span>You have been assigned to Northstar Labs.</span>
                   </div>
-                  <span className="landing-notification-time">now</span>
+                  <X size={13} />
                 </div>
               </div>
             </div>

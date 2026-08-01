@@ -2468,6 +2468,21 @@ textarea::placeholder {
   font-weight: 700;
 }
 
+.landing-preview-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #565b62;
+}
+
+.landing-preview-profile strong {
+  font-size: 9px;
+}
+
+.landing-preview-profile > svg {
+  color: #a1a4a9;
+}
+
 .landing-preview-content {
   padding: 35px 35px 28px;
 }
@@ -2498,80 +2513,77 @@ textarea::placeholder {
 .landing-preview-stats > div {
   display: flex;
   min-height: 74px;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  gap: 11px;
   padding: 13px;
   border: 1px solid var(--border);
   border-radius: 9px;
   background: #fff;
 }
 
-.landing-preview-stats span {
+.landing-preview-stats > div > span:last-child {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.landing-preview-stats small {
   color: #858990;
-  font-size: 8px;
+  font-size: 7px;
+  white-space: nowrap;
 }
 
 .landing-preview-stats strong {
-  font-size: 20px;
+  font-size: 17px;
+  line-height: 1;
 }
 
-.landing-preview-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.8fr);
-  gap: 10px;
+.landing-preview-stat-icon {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: #555a61;
+  background: #f0efec;
 }
 
-.landing-preview-card {
-  min-height: 150px;
+.landing-preview-section {
+  min-height: 157px;
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 9px;
   background: #fff;
 }
 
-.landing-preview-card-head {
+.landing-preview-section-heading {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 8px;
-  font-size: 9px;
-  font-weight: 700;
+  flex-direction: column;
 }
 
-.landing-preview-card-head small {
+.landing-preview-section-heading .eyebrow {
+  margin-bottom: 4px;
+  font-size: 6px;
+}
+
+.landing-preview-section-heading strong {
+  font-size: 10px;
+}
+
+.landing-preview-section-heading small {
+  margin-top: 3px;
   color: #858990;
   font-size: 7px;
-  font-weight: 500;
 }
 
-.landing-preview-row {
+.landing-preview-grid {
   display: grid;
-  grid-template-columns: 28px 1fr auto;
-  align-items: center;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  padding: 10px 0;
-  border-top: 1px solid #efeee9;
-  color: #73777e;
-}
-
-.landing-preview-row > span:nth-child(2) {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 2px;
-  color: #202329;
-}
-
-.landing-preview-row strong {
-  overflow: hidden;
-  font-size: 8px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.landing-preview-row small {
-  color: #8c9096;
-  font-size: 7px;
+  margin-top: 10px;
 }
 
 .landing-company-icon {
@@ -2585,91 +2597,53 @@ textarea::placeholder {
   background: #eeede9;
 }
 
-.landing-company-icon.warm {
-  color: #555a61 !important;
-  background: #eeede9;
-}
-
-.landing-row-role {
-  color: #777b82 !important;
-  font-size: 7px !important;
-  font-weight: 600;
-}
-
-.landing-activity-card > span {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 9px;
-  font-weight: 700;
-}
-
-.landing-activity-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.landing-activity-icon {
-  display: inline-flex;
-  width: 27px;
-  height: 27px;
-  flex: 0 0 27px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  color: #4e535a;
-  background: #ecebe7;
-}
-
-.landing-activity-icon.muted {
-  color: #675e4d;
-  background: #f2eee5;
-}
-
-.landing-activity-item p {
+.landing-preview-assignment-card {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin: 0;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid #efeee9;
+  border-radius: 8px;
+  background: #fdfdfc;
 }
 
-.landing-activity-item strong {
-  font-size: 8px;
+.landing-preview-assignment-card > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.landing-activity-item small {
+.landing-preview-assignment-card small,
+.landing-preview-assignment-card > span {
   color: #8a8e94;
   font-size: 7px;
 }
 
+.landing-preview-assignment-card small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.landing-preview-assignment-card > strong {
+  font-size: 9px;
+}
+
 .landing-notification-card {
   position: absolute;
-  right: 24px;
-  bottom: 28px;
+  top: 72px;
+  right: 18px;
   display: grid;
-  width: 295px;
-  grid-template-columns: 34px 1fr auto;
-  align-items: center;
+  width: 275px;
+  grid-template-columns: 17px 1fr 13px;
+  align-items: flex-start;
   gap: 10px;
   padding: 13px;
   border: 1px solid rgba(214, 212, 205, 0.95);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 18px 48px rgba(25, 28, 33, 0.18);
-}
-
-.landing-notification-index {
-  display: inline-flex;
-  width: 34px;
-  height: 34px;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid var(--border);
-  color: #868a90 !important;
-  font-size: 8px !important;
-  font-weight: 700;
-  letter-spacing: 0.08em;
 }
 
 .landing-notification-card > div {
@@ -2683,8 +2657,7 @@ textarea::placeholder {
   font-size: 9px;
 }
 
-.landing-notification-card span,
-.landing-notification-card small {
+.landing-notification-card span {
   overflow: hidden;
   color: #777c83;
   font-size: 7px;
@@ -2692,9 +2665,12 @@ textarea::placeholder {
   white-space: nowrap;
 }
 
-.landing-notification-time {
-  color: #9a9da2 !important;
-  font-size: 7px !important;
+.landing-notification-card > svg:first-child {
+  color: #5f7e6b;
+}
+
+.landing-notification-card > svg:last-child {
+  color: #9a9da2;
 }
 
 .landing-stack-strip {
@@ -3235,13 +3211,13 @@ textarea::placeholder {
     grid-template-columns: 1fr;
   }
 
-  .landing-activity-card {
+  .landing-preview-assignment-card:nth-child(2) {
     display: none;
   }
 
   .landing-notification-card {
+    top: 67px;
     right: 15px;
-    bottom: 17px;
   }
 
   .landing-section {
@@ -3334,9 +3310,20 @@ textarea::placeholder {
     padding: 10px;
   }
 
+  .landing-preview-stat-icon {
+    width: 28px;
+    height: 28px;
+    flex-basis: 28px;
+  }
+
+  .landing-preview-stats small {
+    line-height: 1.2;
+    white-space: normal;
+  }
+
   .landing-notification-card {
+    top: 59px;
     right: 10px;
-    bottom: 10px;
     width: calc(100% - 20px);
   }
 
