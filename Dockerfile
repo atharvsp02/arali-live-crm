@@ -7,7 +7,7 @@ WORKDIR /workspace
 COPY . .
 
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @live-crm/server db:generate
+RUN DATABASE_URL=postgresql://build:build@localhost:5432/live_crm pnpm --filter @live-crm/server db:generate
 RUN pnpm build
 RUN pnpm --filter @live-crm/server deploy --prod /output/server
 
