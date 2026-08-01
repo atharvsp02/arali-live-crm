@@ -318,13 +318,16 @@ export function LandingPage() {
               </div>
               <div className="landing-stack-item landing-stack-bullmq">
                 <span className="landing-stack-icon">
-                  <img
-                    src="https://bullmq.io/images/bullmq-logo.png"
-                    alt="BullMQ"
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                  />
+                  <span className="landing-stack-bullmark">
+                    <img
+                      src="https://bullmq.io/images/bullmq-logo.png"
+                      alt=""
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                    />
+                  </span>
                 </span>
+                <strong>BullMQ</strong>
               </div>
               <div className="landing-stack-item landing-stack-redis">
                 <span className="landing-stack-icon">

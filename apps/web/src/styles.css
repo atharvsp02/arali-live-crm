@@ -2728,14 +2728,14 @@ textarea::placeholder {
 .landing-stack-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
 }
 
 .landing-stack-icon {
   display: inline-flex;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
   align-items: center;
   justify-content: center;
   border: 1px solid #e7e5e1;
@@ -2745,13 +2745,13 @@ textarea::placeholder {
 }
 
 .landing-stack-icon svg {
-  width: 21px;
-  height: 21px;
+  width: 23px;
+  height: 23px;
 }
 
 .landing-stack-item strong {
   color: #53585f;
-  font-size: 15px;
+  font-size: 16px;
   letter-spacing: -0.018em;
 }
 
@@ -2772,17 +2772,27 @@ textarea::placeholder {
 }
 
 .landing-stack-bullmq .landing-stack-icon {
-  width: 104px;
-  flex-basis: 104px;
   border-color: #20252a;
   background: #111418;
 }
 
-.landing-stack-bullmq img {
+.landing-stack-bullmark {
+  position: relative;
   display: block;
-  width: 90px;
-  max-width: 90px;
+  width: 37px;
+  height: 30px;
+  overflow: hidden;
+}
+
+.landing-stack-bullmark img {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: block;
+  width: 82px;
+  max-width: none;
   height: auto;
+  transform: translateY(-50%);
 }
 
 .landing-section {
