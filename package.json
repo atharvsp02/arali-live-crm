@@ -9,7 +9,7 @@
     "db:migrate:deploy": "pnpm --filter @live-crm/server db:migrate:deploy",
     "db:seed": "pnpm --filter @live-crm/server db:seed",
     "dev": "concurrently -n api,worker,web -c blue,magenta,green \"pnpm --filter @live-crm/server dev:api\" \"pnpm --filter @live-crm/server dev:worker\" \"pnpm --filter @live-crm/web dev\"",
-    "format:check": "prettier --check --ignore-unknown apps packages tests scripts .dockerignore .env.example .gitignore .prettierignore Dockerfile README.md docker-compose.yml eslint.config.mjs package.json playwright.config.ts pnpm-workspace.yaml render.yaml tsconfig.base.json",
+    "format:check": "prettier --check --ignore-unknown apps packages tests scripts .dockerignore .env.example .gitignore .prettierignore Dockerfile README.md docker-compose.yml eslint.config.mjs package.json playwright.config.ts pnpm-workspace.yaml render.yaml tsconfig.base.json vercel.json",
     "lint": "eslint apps packages",
     "test": "sh scripts/test.sh",
     "test:coverage": "sh scripts/test.sh --coverage",

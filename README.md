@@ -206,6 +206,14 @@ E2E_BASE_URL=https://arali-live-crm-production.up.railway.app pnpm test:e2e
 
 Both browser tests passed. The complete test uses separate Admin, Atharv, and Maya sessions and verifies immediate private delivery, persistence after refresh, marking a notification as read, the real delayed worker reminder, and non-delivery to Maya.
 
+### Vercel frontend
+
+The repository also includes `vercel.json` for deploying the Vite frontend separately on Vercel. It builds only the shared package and React application. Requests to `/api` and `/socket.io` are forwarded to the Railway service, which keeps authentication cookies and browser requests on the Vercel origin.
+
+Import the repository into Vercel with the repository root as the project root. The framework, install command, build command, output directory, API proxy, Socket.IO proxy, and SPA fallback are already defined in `vercel.json`.
+
+After Vercel creates the production domain, set the Railway web service's `CLIENT_URL` to that complete `https://` URL and redeploy the Railway web service. Keep `APP_URL` set to the Railway application URL. The Railway deployment remains available as a fallback and continues to run the API, Socket.IO server, worker, PostgreSQL, and Redis.
+
 ## Limitations and tradeoffs
 
 - Users are provisioned through seed data; there is no public registration flow.
