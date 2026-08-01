@@ -188,19 +188,23 @@ The automated tests cover authorization, validation, duplicate assignments, noti
 - Zod validates request data and Prisma parameterizes database operations.
 - Application logs omit cookies, authorization headers, passwords, and tokens.
 
-## Deployment status
+## Live deployment
 
-The repository includes a `Dockerfile` and `render.yaml` for a web service, background worker, PostgreSQL, and Redis-compatible Key Value service. The API serves the built React application, so a separate public API domain is not required.
+- Application: [https://arali-live-crm-production.up.railway.app](https://arali-live-crm-production.up.railway.app)
+- API base: [https://arali-live-crm-production.up.railway.app/api](https://arali-live-crm-production.up.railway.app/api)
+- API health: [https://arali-live-crm-production.up.railway.app/api/health](https://arali-live-crm-production.up.railway.app/api/health)
 
-A public deployment is not active yet because this implementation environment did not have access to a hosting account or billing. Until a public URL is added, the Docker instructions above provide the complete local demo required by the assignment.
+The application is deployed on Railway as four services: the public web and API service, a private BullMQ worker, PostgreSQL, and Redis. The Express server serves the built React application, so the frontend and API share one public origin. The worker does not expose a public domain.
 
-After deployment, the following should be verified on the public domain:
+The web service applies Prisma migrations and deterministic seed data in its pre-deploy command. The worker starts separately with `node dist/worker.js`. Both services reference the same PostgreSQL and Redis instances through Railway's private network.
 
-- Login and secure cookie behavior
-- Socket.IO connectivity in separate browser sessions
-- Migrations and seed data
-- Worker logs and the delayed reminder
-- The `/api/health` endpoint
+The production deployment was verified with:
+
+```bash
+E2E_BASE_URL=https://arali-live-crm-production.up.railway.app pnpm test:e2e
+```
+
+Both browser tests passed. The complete test uses separate Admin, Atharv, and Maya sessions and verifies immediate private delivery, persistence after refresh, marking a notification as read, the real delayed worker reminder, and non-delivery to Maya.
 
 ## Limitations and tradeoffs
 
