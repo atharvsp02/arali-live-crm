@@ -6,10 +6,12 @@ import {
   ASSIGNMENT_ROLES,
   companySchema,
   contactSchema,
+  createUserSchema,
   formatAssignmentRole,
   type AssignmentRole,
   type CompanyInput,
   type ContactInput,
+  type CreateUserInput,
 } from "@live-crm/shared";
 import {
   ArrowUpRight,
@@ -34,7 +36,7 @@ import type {
 import { AppShell } from "../components/AppShell";
 import { useToast } from "../components/ToastProvider";
 
-type AdminTab = "overview" | "companies" | "contacts" | "assignments";
+type AdminTab = "overview" | "companies" | "contacts" | "team" | "assignments";
 
 const tabs: Array<{
   id: AdminTab;
@@ -44,6 +46,7 @@ const tabs: Array<{
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "companies", label: "Companies", icon: Building2 },
   { id: "contacts", label: "Contacts", icon: UsersRound },
+  { id: "team", label: "Team", icon: UserPlus },
   { id: "assignments", label: "Assignments", icon: ClipboardList },
 ];
 
@@ -627,6 +630,218 @@ function ContactsSection({
   );
 }
 
+function TeamSection({
+  users,
+  isLoading,
+  isError,
+  onRetry,
+  search,
+  onSearchChange,
+}: {
+  users: User[];
+  isLoading: boolean;
+  isError: boolean;
+  onRetry: () => void;
+  search: string;
+  onSearchChange: (value: string) => void;
+}) {
+  const queryClient = useQueryClient();
+  const showToast = useToast();
+  const [showForm, setShowForm] = useState(false);
+  const form = useForm<CreateUserInput>({
+    resolver: zodResolver(createUserSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
+  const createUser = useMutation({
+    mutationFn: (input: CreateUserInput) =>
+      apiRequest<User>("/users", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["users"] });
+      form.reset();
+      setShowForm(false);
+      showToast({
+        title: "Team member created",
+        message: "They can now sign in with the credentials you set.",
+        tone: "success",
+      });
+    },
+    onError: (error) => {
+      form.setError("root", {
+        message:
+          error instanceof ApiClientError
+            ? error.message
+            : "Unable to create team member",
+      });
+    },
+  });
+  const filtered = users.filter((user) =>
+    `${user.name} ${user.email}`.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  return (
+    <>
+      <SectionHeading
+        eyebrow="Workspace access"
+        title="Team"
+        description="Create user accounts and make them available for assignments."
+      />
+      <div className="toolbar">
+        <label className="search-field">
+          <Search size={18} />
+          <input
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search team members"
+          />
+        </label>
+        <button
+          className="button button-primary"
+          onClick={() => setShowForm((current) => !current)}
+        >
+          <UserPlus size={18} />
+          New team member
+        </button>
+      </div>
+
+      {showForm ? (
+        <section className="content-card form-card">
+          <div className="card-heading">
+            <div>
+              <h2>Create team member</h2>
+              <p>Set the credentials they will use to sign in.</p>
+            </div>
+          </div>
+          <form
+            className="form-grid"
+            onSubmit={form.handleSubmit((input) => createUser.mutate(input))}
+          >
+            <label>
+              Full name
+              <input
+                {...form.register("name")}
+                autoComplete="name"
+                placeholder="Jordan Lee"
+              />
+              {form.formState.errors.name ? (
+                <span className="field-error">
+                  {form.formState.errors.name.message}
+                </span>
+              ) : null}
+            </label>
+            <label>
+              Email
+              <input
+                type="email"
+                {...form.register("email")}
+                autoComplete="email"
+                placeholder="jordan@company.com"
+              />
+              {form.formState.errors.email ? (
+                <span className="field-error">
+                  {form.formState.errors.email.message}
+                </span>
+              ) : null}
+            </label>
+            <label className="form-span">
+              Temporary password
+              <input
+                type="password"
+                {...form.register("password")}
+                autoComplete="new-password"
+                placeholder="At least 8 characters"
+              />
+              {form.formState.errors.password ? (
+                <span className="field-error">
+                  {form.formState.errors.password.message}
+                </span>
+              ) : null}
+            </label>
+            {form.formState.errors.root ? (
+              <div className="form-error form-span">
+                {form.formState.errors.root.message}
+              </div>
+            ) : null}
+            <div className="form-actions form-span">
+              <button
+                className="button button-secondary"
+                type="button"
+                onClick={() => {
+                  form.reset();
+                  setShowForm(false);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="button button-primary"
+                disabled={createUser.isPending}
+              >
+                {createUser.isPending ? "Creating" : "Create team member"}
+              </button>
+            </div>
+          </form>
+        </section>
+      ) : null}
+
+      {isLoading ? (
+        <DataLoading />
+      ) : isError ? (
+        <DataError onRetry={onRetry} />
+      ) : filtered.length === 0 ? (
+        <div className="empty-state">
+          <UserPlus size={36} />
+          <h3>{search ? "No matching team members" : "No team members yet"}</h3>
+          <p>
+            {search
+              ? "Try a different search term."
+              : "Create a user account before assigning customer records."}
+          </p>
+        </div>
+      ) : (
+        <section className="content-card">
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Access</th>
+                  <th>Added</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      <strong>{user.name}</strong>
+                    </td>
+                    <td>{user.email}</td>
+                    <td>
+                      <span className="tag">User</span>
+                    </td>
+                    <td>
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString()
+                        : "Not available"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+    </>
+  );
+}
+
 function AssignmentsSection({
   companies,
   contacts,
@@ -947,7 +1162,11 @@ export function AdminPage() {
       searchValue={search}
       onSearchChange={updateSearch}
       searchPlaceholder={
-        activeTab === "contacts" ? "Search contacts..." : "Search companies..."
+        activeTab === "contacts"
+          ? "Search contacts..."
+          : activeTab === "team"
+            ? "Search team members..."
+            : "Search companies..."
       }
     >
       <div className="workspace-main">
@@ -976,6 +1195,16 @@ export function AdminPage() {
             isLoading={contactsQuery.isLoading}
             isError={contactsQuery.isError}
             onRetry={() => void contactsQuery.refetch()}
+            search={search}
+            onSearchChange={setSearch}
+          />
+        ) : null}
+        {activeTab === "team" ? (
+          <TeamSection
+            users={usersQuery.data ?? []}
+            isLoading={usersQuery.isLoading}
+            isError={usersQuery.isError}
+            onRetry={() => void usersQuery.refetch()}
             search={search}
             onSearchChange={setSearch}
           />

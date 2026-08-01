@@ -9,6 +9,7 @@ export interface User {
   name: string;
   email: string;
   systemRole: SystemRole;
+  createdAt?: string;
 }
 
 export interface Company {
