@@ -2772,16 +2772,16 @@ textarea::placeholder {
 }
 
 .landing-stack-bullmq .landing-stack-icon {
-  overflow: hidden;
-  justify-content: flex-start;
+  width: 104px;
+  flex-basis: 104px;
   border-color: #20252a;
   background: #111418;
 }
 
 .landing-stack-bullmq img {
   display: block;
-  width: 100px;
-  max-width: none;
+  width: 90px;
+  max-width: 90px;
   height: auto;
 }
 
