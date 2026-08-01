@@ -5,6 +5,7 @@ Arali Live CRM is a small full-stack CRM for managing companies, contacts, and o
 ## What the application does
 
 - Admins can create companies and contacts.
+- Admins can create team-member accounts with individual sign-in credentials.
 - Contacts can optionally belong to a company.
 - Admins can assign a company or contact to a user with a business role.
 - Only the assigned user receives the Socket.IO event.
@@ -45,7 +46,8 @@ I made four important design choices:
 - One user can have only one active assignment for the same record.
 - Notifications are in-app only.
 - The 30-second reminder delay is intended for demonstration.
-- Demo accounts are database seed data. Assignments and notifications are still created through the real API and are not hardcoded in the frontend.
+- Team-member accounts are created by an admin because the CRM represents one organization.
+- Demo accounts are database seed data. Admin-created accounts, assignments, and notifications all use the real API and PostgreSQL.
 
 ## Run locally with Docker
 
@@ -88,20 +90,23 @@ No paid subscription is required for the local setup.
 
 The seed is deterministic and can be run more than once. It creates three users, three companies, and three contacts without creating any assignments.
 
+These accounts are optional shortcuts for reviewing the application. For normal use, sign in as an admin, open **Team**, and create credentials for each team member. New accounts can sign in from the same login screen and immediately become available in the assignment form.
+
 ## Test the live notification flow
 
 1. Open the application in a normal browser window and sign in as Admin.
 2. Open an incognito window and sign in as Atharv.
 3. Open another isolated session as Maya to verify notification isolation.
-4. As Admin, create or select a company or contact.
-5. Open Assignments, select the record, choose Atharv, and select a role.
-6. Click **Create and notify**.
-7. Confirm that Atharv immediately receives a toast and an unread notification.
-8. Confirm that Maya receives nothing and cannot see Atharv's assignment.
-9. Refresh Atharv's page and confirm that the notification is still present.
-10. Mark the notification as read and confirm that the unread count decreases.
-11. Wait about 30 seconds for the follow-up reminder.
-12. Confirm that Atharv receives the second notification and that it also remains after refresh.
+4. As Admin, optionally open **Team** and create another user account.
+5. Create or select a company or contact.
+6. Open Assignments, select the record, choose Atharv or the new user, and select a role.
+7. Click **Create and notify**.
+8. Confirm that the selected user immediately receives a toast and an unread notification.
+9. Confirm that the other user receives nothing and cannot see the selected user's assignment.
+10. Refresh the selected user's page and confirm that the notification is still present.
+11. Mark the notification as read and confirm that the unread count decreases.
+12. Wait about 30 seconds for the follow-up reminder.
+13. Confirm that the selected user receives the second notification and that it also remains after refresh.
 
 Worker activity can be inspected with:
 
@@ -149,6 +154,7 @@ All routes except login and health require the authenticated `httpOnly` cookie.
 | `POST`  | `/api/auth/logout`            | Authenticated | Sign out                                   |
 | `GET`   | `/api/auth/me`                | Authenticated | Get the current user                       |
 | `GET`   | `/api/users?systemRole=USER`  | Admin         | List assignable users                      |
+| `POST`  | `/api/users`                  | Admin         | Create a team-member account               |
 | `GET`   | `/api/companies`              | Authenticated | List companies                             |
 | `POST`  | `/api/companies`              | Admin         | Create a company                           |
 | `GET`   | `/api/contacts`               | Authenticated | List contacts                              |
@@ -177,7 +183,7 @@ pnpm build
 
 `pnpm test:e2e` expects the complete application to be running. It uses separate Admin, Atharv, and Maya browser sessions and tests the full flow, including refresh persistence, read state, the real worker reminder, and the negative assertion that Maya receives nothing.
 
-The automated tests cover authorization, validation, duplicate assignments, notification ownership, Socket.IO isolation, BullMQ processing, retry deduplication, and the complete browser workflow.
+The automated tests cover account creation and sign-in, authorization, validation, duplicate resources, notification ownership, Socket.IO isolation, BullMQ processing, retry deduplication, and the complete browser workflow.
 
 ## Security
 
@@ -216,7 +222,7 @@ The Railway web service uses `https://arali-live-crm.vercel.app` as `CLIENT_URL`
 
 ## Limitations and tradeoffs
 
-- Users are provisioned through seed data; there is no public registration flow.
+- Team members are provisioned by an admin. Open public registration and password recovery are not included.
 - The UI does not currently support editing, deleting, or unassigning records.
 - The application is single-tenant and does not include an organization boundary.
 - Notifications are limited to the application and are not sent by email or mobile push.
