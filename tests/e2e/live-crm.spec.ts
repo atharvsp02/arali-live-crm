@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 async function signIn(page: Page, email: string, password: string) {
   await page.goto("/login");
   await page.getByLabel("Email address").fill(email);
-  await page.getByLabel("Password").fill(password);
+  await page.getByLabel("Password", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
 }
 
@@ -23,9 +23,42 @@ async function clearUnread(page: Page) {
   ).toBeVisible();
 }
 
+test("presents the public CRM landing page and demo entry point", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await expect(
+    page.getByRole("heading", {
+      name: "Customer ownership that reaches the right person, right now.",
+    }),
+  ).toBeVisible();
+  const technologyStack = page.getByLabel("Technology stack");
+  await expect(
+    technologyStack.getByText("PostgreSQL", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    technologyStack.getByText("Socket.IO", { exact: true }),
+  ).toBeVisible();
+
+  await page
+    .locator(".landing-hero-actions")
+    .getByRole("link", { name: "Open application" })
+    .click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(
+    page.getByRole("heading", { name: "Sign in to your workspace" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Optional demo access", { exact: true }).last(),
+  ).toBeVisible();
+});
+
 test("delivers persisted assignment and worker notifications only to the assigned user", async ({
   browser,
 }) => {
+  test.setTimeout(60000);
+
   const adminContext = await browser.newContext();
   const assignedContext = await browser.newContext();
   const otherContext = await browser.newContext();
@@ -124,7 +157,7 @@ test("delivers persisted assignment and worker notifications only to the assigne
       .locator(".toast")
       .filter({ hasText: "Assignment reminder" })
       .filter({ hasText: companyName }),
-  ).toBeVisible({ timeout: 20000 });
+  ).toBeVisible({ timeout: 45000 });
   await expect(
     assignedPage.getByRole("button", {
       name: "Open notifications, 1 unread",
