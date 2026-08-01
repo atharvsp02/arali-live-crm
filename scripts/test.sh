@@ -2,6 +2,8 @@
 
 set -eu
 
+pnpm --filter @live-crm/shared build
+
 docker compose up -d --wait postgres redis
 
 postgres_endpoint=$(docker compose port postgres 5432)

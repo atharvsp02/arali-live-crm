@@ -235,6 +235,73 @@ describe("CRM API authorization", () => {
     expect(response.body.error.code).toBe("FORBIDDEN");
   });
 
+  it("allows an admin to create a team member who can sign in", async () => {
+    const response = await request(httpServer)
+      .post("/api/users")
+      .set("Cookie", adminCookie)
+      .send({
+        name: "  Jordan Lee  ",
+        email: "JORDAN@EXAMPLE.COM",
+        password: "Member123",
+      })
+      .expect(201);
+
+    expect(response.body.data).toMatchObject({
+      name: "Jordan Lee",
+      email: "jordan@example.com",
+      systemRole: "USER",
+    });
+    expect(response.body.data.passwordHash).toBeUndefined();
+    await expect(login("jordan@example.com", "Member123")).resolves.toContain(
+      "live_crm_session=",
+    );
+
+    const duplicate = await request(httpServer)
+      .post("/api/users")
+      .set("Cookie", adminCookie)
+      .send({
+        name: "Different Name",
+        email: "jordan@example.com",
+        password: "Member456",
+      })
+      .expect(409);
+
+    expect(duplicate.body.error.code).toBe("EMAIL_ALREADY_EXISTS");
+  });
+
+  it("rejects invalid team-member credentials", async () => {
+    const response = await request(httpServer)
+      .post("/api/users")
+      .set("Cookie", adminCookie)
+      .send({
+        name: "J",
+        email: "not-an-email",
+        password: "weak",
+      })
+      .expect(400);
+
+    expect(response.body.error.code).toBe("VALIDATION_ERROR");
+    expect(response.body.error.details.fieldErrors).toMatchObject({
+      name: expect.any(Array),
+      email: expect.any(Array),
+      password: expect.any(Array),
+    });
+  });
+
+  it("rejects team-member creation by a regular user", async () => {
+    const response = await request(httpServer)
+      .post("/api/users")
+      .set("Cookie", userACookie)
+      .send({
+        name: "Unauthorized User",
+        email: "unauthorized@example.com",
+        password: "Member123",
+      })
+      .expect(403);
+
+    expect(response.body.error.code).toBe("FORBIDDEN");
+  });
+
   it("creates a contact linked to a company", async () => {
     const response = await request(httpServer)
       .post("/api/contacts")

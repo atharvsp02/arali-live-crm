@@ -16,6 +16,22 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const createUserSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must have at least 2 characters")
+    .max(80),
+  email: z.email().transform((value) => value.toLowerCase()),
+  password: z
+    .string()
+    .min(8, "Password must have at least 8 characters")
+    .max(128)
+    .regex(/[a-z]/, "Password must include a lowercase letter")
+    .regex(/[A-Z]/, "Password must include an uppercase letter")
+    .regex(/[0-9]/, "Password must include a number"),
+});
+
 export const companySchema = z.object({
   name: z.string().trim().min(1, "Company name is required").max(120),
   website: z
@@ -75,6 +91,7 @@ export const usersQuerySchema = z.object({
 export const assignmentTypeSchema = z.enum(ASSIGNMENT_TYPES);
 
 export type LoginInput = z.infer<typeof loginSchema>;
+export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type CompanyInput = z.infer<typeof companySchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
 export type CompanyAssignmentInput = z.infer<typeof companyAssignmentSchema>;
