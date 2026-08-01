@@ -2,12 +2,14 @@ FROM node:22-alpine AS build
 
 RUN corepack enable
 
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/live_crm
+
 WORKDIR /workspace
 
 COPY . .
 
 RUN pnpm install --frozen-lockfile
-RUN DATABASE_URL=postgresql://build:build@localhost:5432/live_crm pnpm --filter @live-crm/server db:generate
+RUN pnpm --filter @live-crm/server db:generate
 RUN pnpm build
 RUN pnpm --filter @live-crm/server deploy --prod /output/server
 
