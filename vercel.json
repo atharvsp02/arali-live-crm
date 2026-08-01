@@ -10,11 +10,11 @@
       "destination": "https://arali-live-crm-production.up.railway.app/api/:path*"
     },
     {
-      "source": "/socket.io/:path*",
-      "destination": "https://arali-live-crm-production.up.railway.app/socket.io/:path*"
+      "source": "/socket.io/(.*)",
+      "destination": "https://arali-live-crm-production.up.railway.app/socket.io/$1"
     },
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
