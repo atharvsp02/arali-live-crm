@@ -2771,11 +2771,6 @@ textarea::placeholder {
   color: #272b30;
 }
 
-.landing-stack-bullmq .landing-stack-icon {
-  border-color: #20252a;
-  background: #111418;
-}
-
 .landing-stack-bullmark {
   position: relative;
   display: block;
@@ -2793,6 +2788,8 @@ textarea::placeholder {
   max-width: none;
   height: auto;
   transform: translateY(-50%);
+  filter: brightness(0) saturate(100%);
+  opacity: 0.82;
 }
 
 .landing-section {
