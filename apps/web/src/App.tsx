@@ -1,38 +1,16 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { RouteGuard } from "./router/RouteGuard";
+import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { AdminPage } from "./pages/AdminPage";
 import { UserDashboardPage } from "./pages/UserDashboardPage";
-import { useAuth } from "./hooks/useAuth";
-
-function HomeRedirect() {
-  const { user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="page-loader">
-        <span className="spinner" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return (
-    <Navigate
-      to={user.systemRole === "ADMIN" ? "/admin" : "/dashboard"}
-      replace
-    />
-  );
-}
 
 export function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomeRedirect />} />
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/demo" element={<Navigate to="/login" replace />} />
       <Route
         path="/admin"
         element={

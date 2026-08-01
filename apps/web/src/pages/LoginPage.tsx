@@ -1,25 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginInput } from "@live-crm/shared";
-import { ArrowRight, BellRing, Building2, ShieldCheck } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ApiClientError } from "../api/client";
+import { AraliLogo } from "../components/AraliLogo";
 import { useAuth } from "../hooks/useAuth";
 
 const demoAccounts = [
   {
     label: "Admin",
+    detail: "Manage customers and assignments",
     email: "admin@crm.local",
     password: "Admin123!",
   },
   {
     label: "Atharv",
+    detail: "Open the account owner workspace",
     email: "atharv@crm.local",
     password: "User123!",
   },
   {
     label: "Maya",
+    detail: "Open the contact owner workspace",
     email: "maya@crm.local",
     password: "User123!",
   },
@@ -28,6 +32,7 @@ const demoAccounts = [
 export function LoginPage() {
   const navigate = useNavigate();
   const { user, login } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -67,68 +72,69 @@ export function LoginPage() {
     }
   }
 
+  function selectDemoAccount(email: string, password: string) {
+    setValue("email", email, { shouldValidate: true });
+    setValue("password", password, { shouldValidate: true });
+  }
+
   return (
     <main className="login-page">
-      <section className="login-story">
-        <div className="brand brand-light">
-          <span className="brand-mark">
-            <Building2 size={22} />
-          </span>
-          <span>Arali CRM</span>
-        </div>
-        <div className="story-copy">
-          <span className="eyebrow eyebrow-light">Live customer ownership</span>
-          <h1>Every assignment reaches the right person, instantly.</h1>
-          <p>
-            A focused CRM workspace with durable notifications, secure delivery,
-            and reliable background follow-ups.
-          </p>
-        </div>
-        <div className="story-features">
-          <div>
-            <BellRing size={20} />
-            <span>Private real-time alerts</span>
-          </div>
-          <div>
-            <ShieldCheck size={20} />
-            <span>Role-based access</span>
-          </div>
-        </div>
-      </section>
-
       <section className="login-panel">
         <div className="login-card">
-          <div className="login-heading">
-            <span className="eyebrow">Welcome back</span>
-            <h2>Sign in to your workspace</h2>
-            <p>Use one of the demo accounts below to test the complete flow.</p>
+          <div className="brand login-brand">
+            <AraliLogo />
           </div>
 
-          <form onSubmit={handleSubmit(submit)} className="form-stack">
-            <label>
-              Email address
-              <input
-                type="email"
-                autoComplete="email"
-                {...register("email")}
-                aria-invalid={Boolean(errors.email)}
-              />
+          <div className="login-heading">
+            <span className="eyebrow">Secure account access</span>
+            <h1>Sign in to your workspace</h1>
+            <p>Enter your account credentials to continue.</p>
+          </div>
+
+          <form
+            onSubmit={handleSubmit(submit)}
+            className="form-stack login-form"
+          >
+            <div className="form-field">
+              <label htmlFor="login-email">Email address</label>
+              <div className="input-with-icon">
+                <Mail size={18} />
+                <input
+                  id="login-email"
+                  type="email"
+                  autoComplete="email"
+                  {...register("email")}
+                  aria-invalid={Boolean(errors.email)}
+                />
+              </div>
               {errors.email ? (
                 <span className="field-error">{errors.email.message}</span>
               ) : null}
-            </label>
-            <label>
-              Password
-              <input
-                type="password"
-                autoComplete="current-password"
-                {...register("password")}
-                aria-invalid={Boolean(errors.password)}
-              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="login-password">Password</label>
+              <div className="input-with-icon">
+                <LockKeyhole size={18} />
+                <input
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  {...register("password")}
+                  aria-invalid={Boolean(errors.password)}
+                />
+                <button
+                  type="button"
+                  className="input-action"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               {errors.password ? (
                 <span className="field-error">{errors.password.message}</span>
               ) : null}
-            </label>
+            </div>
             {errors.root ? (
               <div className="form-error" role="alert">
                 {errors.root.message}
@@ -141,28 +147,69 @@ export function LoginPage() {
             >
               {isSubmitting ? <span className="spinner spinner-small" /> : null}
               {isSubmitting ? "Signing in" : "Sign in"}
-              {!isSubmitting ? <ArrowRight size={18} /> : null}
+              {!isSubmitting ? <ArrowRight size={17} /> : null}
             </button>
           </form>
 
-          <div className="demo-section">
-            <span>Demo accounts</span>
+          <div className="mobile-demo-section">
+            <span>Optional demo access</span>
             <div className="demo-grid">
               {demoAccounts.map((account) => (
                 <button
                   type="button"
                   className="demo-account"
                   key={account.email}
-                  onClick={() => {
-                    setValue("email", account.email);
-                    setValue("password", account.password);
-                  }}
+                  onClick={() =>
+                    selectDemoAccount(account.email, account.password)
+                  }
                 >
                   <strong>{account.label}</strong>
                   <small>{account.email}</small>
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="login-story">
+        <div className="story-content">
+          <span className="login-story-marker">One secure sign-in</span>
+          <span className="eyebrow">Role-aware access</span>
+          <h2>Customer ownership, kept in sync.</h2>
+          <p>
+            Admins assign companies and contacts. Team members receive private
+            updates and keep their work moving from one secure workspace.
+          </p>
+          <ul className="story-features">
+            <li>Private assignment alerts</li>
+            <li>Persistent notification history</li>
+          </ul>
+        </div>
+
+        <div className="demo-section">
+          <div>
+            <strong>Optional demo access</strong>
+            <span>Choose an account to continue.</span>
+          </div>
+          <div className="demo-grid">
+            {demoAccounts.map((account) => (
+              <button
+                type="button"
+                className="demo-account"
+                key={account.email}
+                onClick={() =>
+                  selectDemoAccount(account.email, account.password)
+                }
+              >
+                <span className="demo-avatar">{account.label.slice(0, 1)}</span>
+                <span>
+                  <strong>{account.label}</strong>
+                  <small>{account.detail}</small>
+                </span>
+                <ArrowRight size={15} />
+              </button>
+            ))}
           </div>
         </div>
       </section>

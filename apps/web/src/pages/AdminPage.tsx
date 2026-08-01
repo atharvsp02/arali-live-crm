@@ -31,7 +31,7 @@ import type {
   Contact,
   User,
 } from "../api/types";
-import { AppHeader } from "../components/AppHeader";
+import { AppShell } from "../components/AppShell";
 import { useToast } from "../components/ToastProvider";
 
 type AdminTab = "overview" | "companies" | "contacts" | "assignments";
@@ -197,7 +197,7 @@ function Overview({
           <div className="empty-state compact">
             <ClipboardList size={32} />
             <h3>No assignments yet</h3>
-            <p>Create the first assignment to start the live workflow.</p>
+            <p>Create the first assignment to begin tracking ownership.</p>
           </div>
         ) : (
           <div className="table-wrap">
@@ -237,15 +237,18 @@ function CompaniesSection({
   isLoading,
   isError,
   onRetry,
+  search,
+  onSearchChange,
 }: {
   companies: Company[];
   isLoading: boolean;
   isError: boolean;
   onRetry: () => void;
+  search: string;
+  onSearchChange: (value: string) => void;
 }) {
   const queryClient = useQueryClient();
   const showToast = useToast();
-  const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const form = useForm<CompanyInput>({
     resolver: zodResolver(companySchema),
@@ -293,7 +296,7 @@ function CompaniesSection({
           <Search size={18} />
           <input
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Search companies"
           />
         </label>
@@ -419,16 +422,19 @@ function ContactsSection({
   isLoading,
   isError,
   onRetry,
+  search,
+  onSearchChange,
 }: {
   contacts: Contact[];
   companies: Company[];
   isLoading: boolean;
   isError: boolean;
   onRetry: () => void;
+  search: string;
+  onSearchChange: (value: string) => void;
 }) {
   const queryClient = useQueryClient();
   const showToast = useToast();
-  const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
   const form = useForm<ContactInput>({
     resolver: zodResolver(contactSchema),
@@ -481,7 +487,7 @@ function ContactsSection({
           <Search size={18} />
           <input
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Search contacts"
           />
         </label>
@@ -726,12 +732,8 @@ function AssignmentsSection({
           <div className="card-heading">
             <div>
               <h2>Create assignment</h2>
-              <p>The notification is stored before it is delivered.</p>
+              <p>The selected team member will be notified immediately.</p>
             </div>
-            <span className="live-pill">
-              <span />
-              Live
-            </span>
           </div>
           <form
             className="form-stack"
@@ -826,30 +828,30 @@ function AssignmentsSection({
         <section className="content-card">
           <div className="card-heading">
             <div>
-              <h2>How delivery works</h2>
-              <p>The secure path from assignment to reminder.</p>
+              <h2>What happens next</h2>
+              <p>A clear handoff for every customer relationship.</p>
             </div>
           </div>
           <ol className="delivery-steps">
             <li>
               <span>1</span>
               <div>
-                <strong>Persist atomically</strong>
-                <p>The assignment and alert commit in one transaction.</p>
+                <strong>Ownership updates</strong>
+                <p>The selected user becomes responsible for the record.</p>
               </div>
             </li>
             <li>
               <span>2</span>
               <div>
-                <strong>Deliver privately</strong>
-                <p>Only the verified recipient room receives the event.</p>
+                <strong>Notification sent</strong>
+                <p>They receive a private notification immediately.</p>
               </div>
             </li>
             <li>
               <span>3</span>
               <div>
-                <strong>Follow up reliably</strong>
-                <p>A background worker creates the delayed reminder.</p>
+                <strong>Reminder follows</strong>
+                <p>A follow-up notification arrives automatically.</p>
               </div>
             </li>
           </ol>
@@ -905,6 +907,7 @@ function AssignmentsSection({
 
 export function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>("overview");
+  const [search, setSearch] = useState("");
   const companiesQuery = useQuery({
     queryKey: ["companies"],
     queryFn: () => apiRequest<Company[]>("/companies"),
@@ -924,73 +927,68 @@ export function AdminPage() {
   const companies = companiesQuery.data ?? [];
   const contacts = contactsQuery.data ?? [];
 
+  function navigate(tab: AdminTab) {
+    setActiveTab(tab);
+    setSearch("");
+  }
+
+  function updateSearch(value: string) {
+    if (activeTab === "overview" || activeTab === "assignments") {
+      setActiveTab("companies");
+    }
+    setSearch(value);
+  }
+
   return (
-    <div className="app-shell">
-      <AppHeader />
-      <div className="workspace">
-        <aside className="sidebar">
-          <span className="sidebar-label">Workspace</span>
-          <nav>
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  className={activeTab === tab.id ? "active" : ""}
-                  onClick={() => setActiveTab(tab.id)}
-                  key={tab.id}
-                >
-                  <Icon size={19} />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </nav>
-          <div className="sidebar-status">
-            <span>
-              <span />
-            </span>
-            <div>
-              <strong>Systems operational</strong>
-              <small>Live delivery is ready</small>
-            </div>
-          </div>
-        </aside>
-        <main className="workspace-main">
-          {activeTab === "overview" ? (
-            <Overview
-              companies={companies}
-              contacts={contacts}
-              assignments={assignmentsQuery.data}
-              onNavigate={setActiveTab}
-            />
-          ) : null}
-          {activeTab === "companies" ? (
-            <CompaniesSection
-              companies={companies}
-              isLoading={companiesQuery.isLoading}
-              isError={companiesQuery.isError}
-              onRetry={() => void companiesQuery.refetch()}
-            />
-          ) : null}
-          {activeTab === "contacts" ? (
-            <ContactsSection
-              contacts={contacts}
-              companies={companies}
-              isLoading={contactsQuery.isLoading}
-              isError={contactsQuery.isError}
-              onRetry={() => void contactsQuery.refetch()}
-            />
-          ) : null}
-          {activeTab === "assignments" ? (
-            <AssignmentsSection
-              companies={companies}
-              contacts={contacts}
-              users={usersQuery.data ?? []}
-              assignments={assignmentsQuery.data}
-            />
-          ) : null}
-        </main>
+    <AppShell
+      navigation={tabs}
+      activeNavigation={activeTab}
+      onNavigate={(id) => navigate(id as AdminTab)}
+      searchValue={search}
+      onSearchChange={updateSearch}
+      searchPlaceholder={
+        activeTab === "contacts" ? "Search contacts..." : "Search companies..."
+      }
+    >
+      <div className="workspace-main">
+        {activeTab === "overview" ? (
+          <Overview
+            companies={companies}
+            contacts={contacts}
+            assignments={assignmentsQuery.data}
+            onNavigate={navigate}
+          />
+        ) : null}
+        {activeTab === "companies" ? (
+          <CompaniesSection
+            companies={companies}
+            isLoading={companiesQuery.isLoading}
+            isError={companiesQuery.isError}
+            onRetry={() => void companiesQuery.refetch()}
+            search={search}
+            onSearchChange={setSearch}
+          />
+        ) : null}
+        {activeTab === "contacts" ? (
+          <ContactsSection
+            contacts={contacts}
+            companies={companies}
+            isLoading={contactsQuery.isLoading}
+            isError={contactsQuery.isError}
+            onRetry={() => void contactsQuery.refetch()}
+            search={search}
+            onSearchChange={setSearch}
+          />
+        ) : null}
+        {activeTab === "assignments" ? (
+          <AssignmentsSection
+            companies={companies}
+            contacts={contacts}
+            users={usersQuery.data ?? []}
+            assignments={assignmentsQuery.data}
+          />
+        ) : null}
       </div>
-    </div>
+    </AppShell>
   );
 }

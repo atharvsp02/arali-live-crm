@@ -6,20 +6,37 @@ import {
   BriefcaseBusiness,
   Building2,
   CalendarClock,
+  CircleAlert,
+  LayoutDashboard,
   Mail,
   MapPin,
   UsersRound,
 } from "lucide-react";
 import { apiRequest } from "../api/client";
 import type { AssignmentCollection } from "../api/types";
-import { AppHeader } from "../components/AppHeader";
+import { AppShell } from "../components/AppShell";
 import { NotificationPanel } from "../components/NotificationPanel";
 import { useAuth } from "../hooks/useAuth";
 import { useNotifications } from "../hooks/useNotifications";
 
+function AssignmentLoadError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="empty-state user-empty" role="alert">
+      <CircleAlert size={34} />
+      <h3>Unable to load assignments</h3>
+      <p>Check the connection and try again.</p>
+      <button className="button button-secondary" onClick={onRetry}>
+        Try again
+      </button>
+    </div>
+  );
+}
+
 export function UserDashboardPage() {
   const { user } = useAuth();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [activeSection, setActiveSection] = useState("overview");
   const notifications = useNotifications();
   const assignmentsQuery = useQuery({
     queryKey: ["assignments", "me"],
@@ -28,15 +45,43 @@ export function UserDashboardPage() {
   const assignments = assignmentsQuery.data;
   const companyCount = assignments?.companies.length ?? 0;
   const contactCount = assignments?.contacts.length ?? 0;
+  const normalizedSearch = search.trim().toLowerCase();
+  const visibleCompanies =
+    assignments?.companies.filter((assignment) =>
+      assignment.company.name.toLowerCase().includes(normalizedSearch),
+    ) ?? [];
+  const visibleContacts =
+    assignments?.contacts.filter((assignment) =>
+      `${assignment.contact.firstName} ${assignment.contact.lastName}`
+        .toLowerCase()
+        .includes(normalizedSearch),
+    ) ?? [];
+  const navigation = [
+    { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "companies", label: "My companies", icon: Building2 },
+    { id: "contacts", label: "My contacts", icon: UsersRound },
+  ];
+
+  function navigate(section: string) {
+    setActiveSection(section);
+    document
+      .getElementById(`user-${section}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
-    <div className="app-shell user-shell">
-      <AppHeader
-        unreadCount={notifications.unreadCount}
-        onOpenNotifications={() => setNotificationsOpen(true)}
-      />
-      <main className="user-main">
-        <section className="welcome-banner">
+    <AppShell
+      navigation={navigation}
+      activeNavigation={activeSection}
+      onNavigate={navigate}
+      searchValue={search}
+      onSearchChange={setSearch}
+      searchPlaceholder="Search your assignments..."
+      unreadCount={notifications.unreadCount}
+      onOpenNotifications={() => setNotificationsOpen(true)}
+    >
+      <div className="user-main">
+        <section className="welcome-banner" id="user-overview">
           <div>
             <span className="eyebrow eyebrow-light">Your workspace</span>
             <h1>Welcome back, {user?.name}.</h1>
@@ -86,7 +131,7 @@ export function UserDashboardPage() {
           </button>
         </section>
 
-        <section className="dashboard-section">
+        <section className="dashboard-section" id="user-companies">
           <div className="card-heading">
             <div>
               <span className="eyebrow">Accounts</span>
@@ -104,15 +149,27 @@ export function UserDashboardPage() {
                 </div>
               ))}
             </div>
-          ) : companyCount === 0 ? (
+          ) : assignmentsQuery.isError ? (
+            <AssignmentLoadError
+              onRetry={() => void assignmentsQuery.refetch()}
+            />
+          ) : companyCount === 0 || visibleCompanies.length === 0 ? (
             <div className="empty-state user-empty">
               <Building2 size={36} />
-              <h3>No company assignments yet</h3>
-              <p>New assignments from your administrator will appear here.</p>
+              <h3>
+                {normalizedSearch
+                  ? "No matching companies"
+                  : "No company assignments yet"}
+              </h3>
+              <p>
+                {normalizedSearch
+                  ? "Try a different search term."
+                  : "New assignments from your administrator will appear here."}
+              </p>
             </div>
           ) : (
             <div className="card-grid">
-              {assignments?.companies.map((assignment) => (
+              {visibleCompanies.map((assignment) => (
                 <article
                   className="data-card assignment-card"
                   key={assignment.id}
@@ -152,7 +209,7 @@ export function UserDashboardPage() {
           )}
         </section>
 
-        <section className="dashboard-section">
+        <section className="dashboard-section" id="user-contacts">
           <div className="card-heading">
             <div>
               <span className="eyebrow">People</span>
@@ -160,15 +217,37 @@ export function UserDashboardPage() {
               <p>Customer contacts assigned directly to you.</p>
             </div>
           </div>
-          {!assignmentsQuery.isLoading && contactCount === 0 ? (
+          {assignmentsQuery.isLoading ? (
+            <div className="card-grid">
+              {Array.from({ length: 2 }).map((_, index) => (
+                <div className="data-card skeleton-card" key={index}>
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              ))}
+            </div>
+          ) : assignmentsQuery.isError ? (
+            <AssignmentLoadError
+              onRetry={() => void assignmentsQuery.refetch()}
+            />
+          ) : contactCount === 0 || visibleContacts.length === 0 ? (
             <div className="empty-state user-empty">
               <UsersRound size={36} />
-              <h3>No contact assignments yet</h3>
-              <p>Assigned customer contacts will appear here.</p>
+              <h3>
+                {normalizedSearch
+                  ? "No matching contacts"
+                  : "No contact assignments yet"}
+              </h3>
+              <p>
+                {normalizedSearch
+                  ? "Try a different search term."
+                  : "Assigned customer contacts will appear here."}
+              </p>
             </div>
           ) : (
             <div className="card-grid">
-              {assignments?.contacts.map((assignment) => (
+              {visibleContacts.map((assignment) => (
                 <article
                   className="data-card assignment-card"
                   key={assignment.id}
@@ -210,7 +289,7 @@ export function UserDashboardPage() {
             </div>
           )}
         </section>
-      </main>
+      </div>
 
       <NotificationPanel
         open={notificationsOpen}
@@ -223,6 +302,6 @@ export function UserDashboardPage() {
         onMarkAllRead={notifications.markAllRead}
         onRetry={() => void notifications.refetch()}
       />
-    </div>
+    </AppShell>
   );
 }
