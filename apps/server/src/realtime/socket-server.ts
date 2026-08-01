@@ -8,7 +8,7 @@ import {
   type NotificationEvent,
 } from "@live-crm/shared";
 import { prisma } from "../config/database.js";
-import { env } from "../config/env.js";
+import { allowedOrigins } from "../config/env.js";
 import { logger } from "../config/logger.js";
 import { redisSubscriber } from "../config/redis.js";
 import { verifyAuthToken } from "../lib/jwt.js";
@@ -16,7 +16,7 @@ import { verifyAuthToken } from "../lib/jwt.js";
 export function createSocketServer(httpServer: HttpServer) {
   const io = new Server(httpServer, {
     cors: {
-      origin: env.CLIENT_URL,
+      origin: allowedOrigins,
       credentials: true,
     },
   });

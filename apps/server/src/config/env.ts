@@ -26,3 +26,5 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+
+export const allowedOrigins = [...new Set([env.APP_URL, env.CLIENT_URL])];

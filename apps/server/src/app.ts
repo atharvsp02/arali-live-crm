@@ -6,7 +6,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import { pinoHttp } from "pino-http";
-import { env } from "./config/env.js";
+import { allowedOrigins, env } from "./config/env.js";
 import { logger } from "./config/logger.js";
 import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
 import { assignmentsRouter } from "./modules/assignments/assignments.routes.js";
@@ -24,7 +24,7 @@ export function createApp() {
   app.use(helmet());
   app.use(
     cors({
-      origin: env.CLIENT_URL,
+      origin: allowedOrigins,
       credentials: true,
     }),
   );

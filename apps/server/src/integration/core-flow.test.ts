@@ -189,6 +189,28 @@ afterAll(async () => {
 });
 
 describe("CRM API authorization", () => {
+  it.each([
+    ["application", process.env.APP_URL!],
+    ["frontend", process.env.CLIENT_URL!],
+  ])("allows the configured %s origin", async (_label, origin) => {
+    const response = await request(httpServer)
+      .get("/api/health")
+      .set("Origin", origin)
+      .expect(200);
+
+    expect(response.headers["access-control-allow-origin"]).toBe(origin);
+    expect(response.headers["access-control-allow-credentials"]).toBe("true");
+  });
+
+  it("does not allow an unknown browser origin", async () => {
+    const response = await request(httpServer)
+      .get("/api/health")
+      .set("Origin", "https://untrusted.example")
+      .expect(200);
+
+    expect(response.headers["access-control-allow-origin"]).toBeUndefined();
+  });
+
   it("allows an admin to create a company", async () => {
     const response = await request(httpServer)
       .post("/api/companies")

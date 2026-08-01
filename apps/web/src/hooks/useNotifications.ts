@@ -43,7 +43,7 @@ export function useNotifications() {
 
     const socket = io({
       withCredentials: true,
-      transports: ["websocket", "polling"],
+      transports: ["polling", "websocket"],
     });
 
     socket.on(NOTIFICATION_EVENT, (notification: NotificationPayload) => {
