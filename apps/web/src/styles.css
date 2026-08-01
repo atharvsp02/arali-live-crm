@@ -2717,18 +2717,72 @@ textarea::placeholder {
   font-weight: 600;
 }
 
-.landing-stack-strip div div {
+.landing-stack-logos {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: clamp(25px, 6vw, 70px);
+  gap: clamp(24px, 4.5vw, 58px);
 }
 
-.landing-stack-strip strong {
-  color: #777b81;
-  font-size: clamp(15px, 2vw, 19px);
-  letter-spacing: -0.025em;
+.landing-stack-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.landing-stack-icon {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e7e5e1;
+  border-radius: 11px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgb(31 35 40 / 5%);
+}
+
+.landing-stack-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.landing-stack-item strong {
+  color: #53585f;
+  font-size: 15px;
+  letter-spacing: -0.018em;
+}
+
+.landing-stack-postgres .landing-stack-icon {
+  color: #336791;
+}
+
+.landing-stack-socket .landing-stack-icon {
+  color: #101820;
+}
+
+.landing-stack-redis .landing-stack-icon {
+  color: #ff4438;
+}
+
+.landing-stack-jwt .landing-stack-icon {
+  color: #272b30;
+}
+
+.landing-stack-bullmq .landing-stack-icon {
+  overflow: hidden;
+  justify-content: flex-start;
+  border-color: #20252a;
+  background: #111418;
+}
+
+.landing-stack-bullmq img {
+  display: block;
+  width: 100px;
+  max-width: none;
+  height: auto;
 }
 
 .landing-section {
@@ -3279,7 +3333,7 @@ textarea::placeholder {
     width: calc(100% - 20px);
   }
 
-  .landing-stack-strip div div {
+  .landing-stack-logos {
     gap: 20px 30px;
   }
 

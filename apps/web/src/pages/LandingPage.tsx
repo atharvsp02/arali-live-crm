@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  SiJsonwebtokens,
+  SiPostgresql,
+  SiRedis,
+  SiSocketdotio,
+} from "react-icons/si";
+import {
   ArrowRight,
   Bell,
   BriefcaseBusiness,
@@ -297,12 +303,42 @@ export function LandingPage() {
         <section className="landing-stack-strip" aria-label="Technology stack">
           <div className="landing-container">
             <span>Built with a reliable stack</span>
-            <div>
-              <strong>PostgreSQL</strong>
-              <strong>Socket.IO</strong>
-              <strong>BullMQ</strong>
-              <strong>Redis</strong>
-              <strong>JWT Auth</strong>
+            <div className="landing-stack-logos">
+              <div className="landing-stack-item landing-stack-postgres">
+                <span className="landing-stack-icon">
+                  <SiPostgresql aria-hidden="true" />
+                </span>
+                <strong>PostgreSQL</strong>
+              </div>
+              <div className="landing-stack-item landing-stack-socket">
+                <span className="landing-stack-icon">
+                  <SiSocketdotio aria-hidden="true" />
+                </span>
+                <strong>Socket.IO</strong>
+              </div>
+              <div className="landing-stack-item landing-stack-bullmq">
+                <span className="landing-stack-icon">
+                  <img
+                    src="https://bullmq.io/images/bullmq-logo.png"
+                    alt=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer"
+                  />
+                </span>
+                <strong>BullMQ</strong>
+              </div>
+              <div className="landing-stack-item landing-stack-redis">
+                <span className="landing-stack-icon">
+                  <SiRedis aria-hidden="true" />
+                </span>
+                <strong>Redis</strong>
+              </div>
+              <div className="landing-stack-item landing-stack-jwt">
+                <span className="landing-stack-icon">
+                  <SiJsonwebtokens aria-hidden="true" />
+                </span>
+                <strong>JWT</strong>
+              </div>
             </div>
           </div>
         </section>

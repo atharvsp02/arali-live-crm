@@ -40,6 +40,15 @@ test("presents the public CRM landing page and demo entry point", async ({
   await expect(
     technologyStack.getByText("Socket.IO", { exact: true }),
   ).toBeVisible();
+  await expect(technologyStack.locator(".landing-stack-item")).toHaveCount(5);
+  await expect(technologyStack.locator("svg")).toHaveCount(4);
+  const bullMqLogo = technologyStack.locator('img[src*="bullmq-logo"]');
+  await expect(bullMqLogo).toBeVisible();
+  await expect
+    .poll(() =>
+      bullMqLogo.evaluate((image: HTMLImageElement) => image.naturalWidth),
+    )
+    .toBeGreaterThan(0);
 
   await page
     .locator(".landing-hero-actions")
