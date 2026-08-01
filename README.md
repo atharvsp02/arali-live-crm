@@ -190,29 +190,29 @@ The automated tests cover authorization, validation, duplicate assignments, noti
 
 ## Live deployment
 
-- Application: [https://arali-live-crm-production.up.railway.app](https://arali-live-crm-production.up.railway.app)
+- Application: [https://arali-live-crm.vercel.app](https://arali-live-crm.vercel.app)
 - API base: [https://arali-live-crm-production.up.railway.app/api](https://arali-live-crm-production.up.railway.app/api)
-- API health: [https://arali-live-crm-production.up.railway.app/api/health](https://arali-live-crm-production.up.railway.app/api/health)
+- API health: [https://arali-live-crm.vercel.app/api/health](https://arali-live-crm.vercel.app/api/health)
 
-The application is deployed on Railway as four services: the public web and API service, a private BullMQ worker, PostgreSQL, and Redis. The Express server serves the built React application, so the frontend and API share one public origin. The worker does not expose a public domain.
+The React frontend is deployed on Vercel. Same-origin `/api` and `/socket.io` requests are forwarded to the Railway backend. Railway runs the Express API and Socket.IO server, a private BullMQ worker, PostgreSQL, and Redis. The worker does not expose a public domain.
 
 The web service applies Prisma migrations and deterministic seed data in its pre-deploy command. The worker starts separately with `node dist/worker.js`. Both services reference the same PostgreSQL and Redis instances through Railway's private network.
 
 The production deployment was verified with:
 
 ```bash
-E2E_BASE_URL=https://arali-live-crm-production.up.railway.app pnpm test:e2e
+E2E_BASE_URL=https://arali-live-crm.vercel.app pnpm test:e2e
 ```
 
 Both browser tests passed. The complete test uses separate Admin, Atharv, and Maya sessions and verifies immediate private delivery, persistence after refresh, marking a notification as read, the real delayed worker reminder, and non-delivery to Maya.
 
 ### Vercel frontend
 
-The repository also includes `vercel.json` for deploying the Vite frontend separately on Vercel. It builds only the shared package and React application. Requests to `/api` and `/socket.io` are forwarded to the Railway service, which keeps authentication cookies and browser requests on the Vercel origin.
+The repository includes `vercel.json` for deploying the Vite frontend on Vercel. It builds only the shared package and React application. Requests to `/api` and `/socket.io` are forwarded to the Railway service, which keeps authentication cookies and browser requests on the Vercel origin.
 
 Import the repository into Vercel with the repository root as the project root. The framework, install command, build command, output directory, API proxy, Socket.IO proxy, and SPA fallback are already defined in `vercel.json`.
 
-After Vercel creates the production domain, set the Railway web service's `CLIENT_URL` to that complete `https://` URL and redeploy the Railway web service. Keep `APP_URL` set to the Railway application URL. The Railway deployment remains available as a fallback and continues to run the API, Socket.IO server, worker, PostgreSQL, and Redis.
+The Railway web service uses `https://arali-live-crm.vercel.app` as `CLIENT_URL` and keeps its Railway domain as `APP_URL`. The Railway domain remains available as a fallback and continues to run the API, Socket.IO server, worker, PostgreSQL, and Redis.
 
 ## Limitations and tradeoffs
 
