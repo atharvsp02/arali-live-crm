@@ -2689,7 +2689,7 @@ textarea::placeholder {
 
 .landing-stack-strip span {
   color: #8b8f95;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -2704,30 +2704,30 @@ textarea::placeholder {
 .landing-stack-item {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 13px;
 }
 
 .landing-stack-icon {
   display: inline-flex;
-  width: 44px;
-  height: 44px;
-  flex: 0 0 44px;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
   align-items: center;
   justify-content: center;
   border: 1px solid #e7e5e1;
-  border-radius: 11px;
+  border-radius: 14px;
   background: #ffffff;
   box-shadow: 0 4px 14px rgb(31 35 40 / 5%);
 }
 
 .landing-stack-icon svg {
-  width: 23px;
-  height: 23px;
+  width: 29px;
+  height: 29px;
 }
 
 .landing-stack-item strong {
   color: #53585f;
-  font-size: 16px;
+  font-size: 18px;
   letter-spacing: -0.018em;
 }
 
@@ -2750,8 +2750,8 @@ textarea::placeholder {
 .landing-stack-bullmark {
   position: relative;
   display: block;
-  width: 37px;
-  height: 30px;
+  width: 46px;
+  height: 38px;
   overflow: hidden;
 }
 
@@ -2760,7 +2760,7 @@ textarea::placeholder {
   top: 50%;
   left: 0;
   display: block;
-  width: 82px;
+  width: 102px;
   max-width: none;
   height: auto;
   transform: translateY(-50%);
@@ -3329,6 +3329,35 @@ textarea::placeholder {
 
   .landing-stack-logos {
     gap: 20px 30px;
+  }
+
+  .landing-stack-item {
+    gap: 10px;
+  }
+
+  .landing-stack-icon {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+    border-radius: 12px;
+  }
+
+  .landing-stack-icon svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .landing-stack-item strong {
+    font-size: 16px;
+  }
+
+  .landing-stack-bullmark {
+    width: 40px;
+    height: 34px;
+  }
+
+  .landing-stack-bullmark img {
+    width: 90px;
   }
 
   .landing-bento-grid {
